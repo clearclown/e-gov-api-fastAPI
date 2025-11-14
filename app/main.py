@@ -14,7 +14,7 @@ import time
 from app.core.config import settings
 from app.core.cache import law_cache
 from app.core.exceptions import EGovAPIError
-from app.api.endpoints import laws
+from app.api.endpoints import laws, cases
 
 # ロギング設定
 log_level_str = settings.log_level.strip('"').strip("'").upper()
@@ -172,6 +172,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 # ルーター登録
 app.include_router(laws.router)
+app.include_router(cases.router)
 
 
 # ルートエンドポイント
@@ -190,13 +191,16 @@ async def root():
     return {
         "name": settings.app_name,
         "version": settings.app_version,
-        "description": "日本法令API - e-gov法令APIと連携した法令情報検索サービス",
+        "description": "日本法令・判例API - e-gov法令APIおよび裁判所判例データと連携した法律情報検索サービス",
         "docs": "/docs",
         "redoc": "/redoc",
         "endpoints": {
             "laws_search": "/api/v1/laws/search",
             "law_detail": "/api/v1/laws/{law_id}",
-            "law_history": "/api/v1/laws/{law_id}/history"
+            "law_history": "/api/v1/laws/{law_id}/history",
+            "cases_search": "/api/v1/cases/search",
+            "case_detail": "/api/v1/cases/{case_id}",
+            "courts_list": "/api/v1/cases/courts/list"
         }
     }
 
