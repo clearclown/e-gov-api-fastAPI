@@ -3,7 +3,7 @@
 """
 
 import pytest
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from unittest.mock import AsyncMock, patch, MagicMock
 
 from app.main import app
@@ -17,7 +17,8 @@ class TestLawAPI:
     @pytest.fixture
     async def async_client(self):
         """非同期テストクライアント"""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             yield client
 
     @pytest.mark.asyncio

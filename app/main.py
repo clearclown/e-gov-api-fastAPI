@@ -17,8 +17,9 @@ from app.core.exceptions import EGovAPIError
 from app.api.endpoints import laws
 
 # ロギング設定
+log_level_str = settings.log_level.strip('"').strip("'").upper()
 logging.basicConfig(
-    level=getattr(logging, settings.log_level),
+    level=getattr(logging, log_level_str, logging.INFO),
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)

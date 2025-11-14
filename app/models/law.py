@@ -4,7 +4,7 @@
 このモジュールは法令検索結果、法令詳細、改正情報を表すPydanticモデルを定義します。
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import date
 from typing import Optional, List, Dict, Any
 
@@ -29,8 +29,8 @@ class LawSearchResult(BaseModel):
     promulgation_date: date = Field(..., description="公布日")
     enforcement_date: Optional[date] = Field(None, description="施行日")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "law_id": "405AC0000000087",
                 "law_number": "平成十七年法律第八十七号",
@@ -40,6 +40,7 @@ class LawSearchResult(BaseModel):
                 "enforcement_date": "2006-05-01"
             }
         }
+    )
 
 
 class LawDetail(BaseModel):
@@ -68,8 +69,8 @@ class LawDetail(BaseModel):
     toc: List[Dict[str, Any]] = Field(default_factory=list, description="目次構造")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="メタデータ")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "law_id": "405AC0000000087",
                 "law_number": "平成十七年法律第八十七号",
@@ -90,6 +91,7 @@ class LawDetail(BaseModel):
                 }
             }
         }
+    )
 
 
 class LawAmendment(BaseModel):
@@ -112,8 +114,8 @@ class LawAmendment(BaseModel):
     enforcement_date: Optional[date] = Field(None, description="改正施行日")
     summary: str = Field(..., description="改正概要")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "amendment_id": "令和元年法律第70号",
                 "law_id": "405AC0000000087",
@@ -123,6 +125,7 @@ class LawAmendment(BaseModel):
                 "summary": "株主総会資料の電子提供制度の創設等"
             }
         }
+    )
 
 
 class LawSearchResponse(BaseModel):
@@ -141,8 +144,8 @@ class LawSearchResponse(BaseModel):
     offset: int = Field(..., description="オフセット")
     results: List[LawSearchResult] = Field(..., description="検索結果")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "total": 125,
                 "limit": 50,
@@ -159,6 +162,7 @@ class LawSearchResponse(BaseModel):
                 ]
             }
         }
+    )
 
 
 class LawHistoryResponse(BaseModel):
@@ -175,8 +179,8 @@ class LawHistoryResponse(BaseModel):
     law_name: str = Field(..., description="法令名")
     amendments: List[LawAmendment] = Field(..., description="改正履歴")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "law_id": "405AC0000000087",
                 "law_name": "会社法",
@@ -192,3 +196,4 @@ class LawHistoryResponse(BaseModel):
                 ]
             }
         }
+    )
