@@ -1,173 +1,188 @@
-# 🚀 FastAPIを使用したe-Gov APIプロジェクトの詳細ガイド 🌐
+# e-gov API FastAPI
 
-## プロジェクトの概要
-このプロジェクトは、FastAPIフレームワークを使用して、e-Gov APIにアクセスし、公的文書を取得するためのAPIを構築することを目的としています。プロジェクトには、Dockerfile、必要なPythonパッケージを指定したrequirements.txt、FastAPIアプリケーションのメインスクリプト、そしてテンプレートを含むHTMLファイルが含まれています。
+日本国内の法律および判例に関する正確で最新の情報を取得するためのAPIプロジェクト
 
-### 📝 8.1 files.txtを分析する
-各ファイルの内容を確認し、全体の構成を把握します。
+## プロジェクト概要
 
-### 📝 8.2 タイトルを決める
-**タイトル:** "🚀 FastAPIを使用したe-Gov APIプロジェクトの詳細ガイド 🌐"
+このプロジェクトは、日本の法律・判例情報へのアクセスを提供するFastAPIベースのAPIサーバーです。uvパッケージマネージャーを使用し、将来的にはAgentic RAGやClaude Agent SDKとの統合を見据えた設計となっています。
 
-### 📝 8.3 プロジェクトの概要
-このプロジェクトは、FastAPIフレームワークを使用して、e-Gov APIにアクセスし、公的文書を取得するためのAPIを構築することを目的としています。プロジェクトには、Dockerfile、必要なPythonパッケージを指定したrequirements.txt、FastAPIアプリケーションのメインスクリプト、そしてテンプレートを含むHTMLファイルが含まれています。
+## 主な機能目標
 
-### 📝 8.4 各種バージョン、動作環境
-- **Python:** 3.10-slim
-- **FastAPI:** 最新バージョン
-- **httpx:** 最新バージョン
-- **uvicorn:** 最新バージョン
+### 1. 法律情報の取得
+- **e-gov法令API**との統合
+  - 日本国内の現行法令の検索・取得
+  - 法令の改正履歴の追跡
+  - 法令データの構造化された提供
 
-### 📝 8.5 仕様技術を表にてまとめる
-| 技術       | バージョン    |
-|------------|---------------|
-| Python     | 3.10-slim     |
-| FastAPI    | 最新          |
-| httpx      | 最新          |
-| uvicorn    | 最新          |
-| Docker     | 最新          |
+### 2. 判例情報の取得
+- 信頼性の高い判例データソースの統合
+  - 裁判所ウェブサイトからのデータ取得
+  - 判例データベースAPIの活用
+  - Webスクレイピングによる補完的なデータ収集
 
-### 📝 8.6 仕様技術の説明をする。
-- **Python:** オブジェクト指向の高レベルプログラミング言語であり、読みやすさと生産性の高さが特徴です。
-- **FastAPI:** 高速なAPIを構築するためのPythonフレームワークで、簡単に使えると同時に非常にパフォーマンスが高いです。まるで光速でデータを取得できるような感覚を味わえます🚀。Djangoは古典的な映画のように堅実で信頼できますが、FastAPIは最新のSF映画のようにスピーディでスタイリッシュです。
-- **httpx:** HTTPリクエストを行うための非同期クライアントです。非同期処理により、他のタスクをブロックせずにHTTPリクエストを送信できます。
-- **uvicorn:** FastAPIアプリケーションを実行するためのASGIサーバーです。高性能なASGIサーバーとして知られています。
-- **Docker:** アプリケーションをコンテナ内で実行するためのプラットフォームで、一貫性のある環境を提供します。コンテナ化により、依存関係の問題を解消し、デプロイが容易になります。
+### 3. 将来的な拡張
 
-### 📝 8.7 ディレクトリ構成をまとめる
+#### Agentic RAG統合
+- 法律・判例データの効率的な検索と取得
+- コンテキストを考慮した情報提供
+- 複数のデータソースを横断した統合検索
+
+#### Claude Agent SDK統合
+参考: [Claude Agent SDK Migration Guide](https://code.claude.com/docs/ja/sdk/migration-guide)
+
+- カスタムツールとしての法律・判例検索機能の提供
+- 自然言語による法律相談インターフェース
+- 法的文書の分析・要約機能
+
+## 技術スタック
+
+- **フレームワーク**: FastAPI
+- **パッケージ管理**: uv
+- **Python**: 3.10+
+- **予定統合**:
+  - Claude Agent SDK (`@anthropic-ai/claude-agent-sdk`)
+  - MCP (Model Context Protocol) サーバー実装
+
+## プロジェクト構造（予定）
+
 ```
 e-gov-api-fastAPI/
-├── Dockerfile
-├── requirements.txt
-└── app/
-    ├── main.py
-    └── templates/
-        └── index.html
+├── app/
+│   ├── api/
+│   │   ├── endpoints/
+│   │   │   ├── laws.py          # 法令API
+│   │   │   └── cases.py         # 判例API
+│   │   └── router.py
+│   ├── core/
+│   │   ├── config.py
+│   │   └── security.py
+│   ├── services/
+│   │   ├── egov_client.py       # e-gov API クライアント
+│   │   ├── case_scraper.py      # 判例スクレイピング
+│   │   └── rag_service.py       # RAG統合サービス
+│   └── main.py
+├── .claude/
+│   ├── agents/                   # Claude サブエージェント定義
+│   ├── skills/                   # カスタムスキル
+│   └── settings.json
+├── tests/
+├── pyproject.toml
+└── README.md
 ```
 
-### 📝 8.8 各ファイルの関数がどこのファイルに接続するかを矢印にて詳細とともに説明をする。
-- **main.py**
-  - `read_root` 関数: `index.html`テンプレートを返す。
-  - `get_official_document` 関数: e-Gov APIにPOSTリクエストを送信し、結果を`index.html`テンプレートに渡す。
+## セットアップ
 
-### 📝 8.9 各ファイルの重要な部分の説明をする。
-- **Dockerfile:** Pythonのスリムなイメージを使用してアプリケーションをコンテナ化します。これにより、軽量で効率的なコンテナイメージを作成できます。
-- **requirements.txt:** FastAPI、httpx、uvicornなどの依存関係を指定します。これにより、環境の一貫性が保たれます。
-- **main.py:** FastAPIアプリケーションのメインスクリプトです。APIエンドポイントの定義と、e-Gov APIとの通信を行います。
-- **index.html:** 公的文書を取得するためのフォームを含むHTMLテンプレートです。ユーザーインターフェースを提供します。
+### 必要要件
+- Python 3.10以上
+- uv パッケージマネージャー
 
-### 📝 8.10 各ファイルの詳細な説明
-**main.py**
+### インストール
+
+```bash
+# uvのインストール（未インストールの場合）
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# プロジェクトのセットアップ
+uv venv
+source .venv/bin/activate  # Linux/Mac
+# または
+.venv\Scripts\activate  # Windows
+
+# 依存関係のインストール
+uv pip install -e .
+```
+
+## API設計（予定）
+
+### 法令エンドポイント
+
+```
+GET /api/v1/laws/search        # 法令検索
+GET /api/v1/laws/{law_id}      # 特定法令の取得
+GET /api/v1/laws/{law_id}/history  # 改正履歴
+```
+
+### 判例エンドポイント
+
+```
+GET /api/v1/cases/search       # 判例検索
+GET /api/v1/cases/{case_id}    # 特定判例の取得
+```
+
+## データソース
+
+### 1. e-gov 法令API
+- URL: https://elaws.e-gov.go.jp/
+- 提供データ: 日本国内の全法令データ
+- 更新頻度: リアルタイム
+
+### 2. 裁判所ウェブサイト
+- URL: https://www.courts.go.jp/
+- 提供データ: 判例情報
+- 取得方法: APIまたはWebスクレイピング
+
+### 3. その他検討中のデータソース
+- 判例データベースAPI（商用含む）
+- 法律関連オープンデータ
+
+## Claude Agent SDK統合例
+
 ```python
-from fastapi import FastAPI, HTTPException, Request, Form
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
-import httpx
+from claude_agent_sdk import tool, create_sdk_mcp_server
 
-app = FastAPI()
-templates = Jinja2Templates(directory="app/templates")
+@tool("search_law", "日本の法令を検索", {"query": str})
+async def search_law(args):
+    # e-gov APIを使用した法令検索
+    results = await egov_client.search(args["query"])
+    return {"content": [{"type": "text", "text": results}]}
 
-class OfficialDocumentRequest(BaseModel):
-    arrive_id: str
-    notice_sub_id: int
+@tool("search_case", "判例を検索", {"keywords": str})
+async def search_case(args):
+    # 判例データベースでの検索
+    results = await case_service.search(args["keywords"])
+    return {"content": [{"type": "text", "text": results}]}
 
-class Metadata(BaseModel):
-    title: str
-    detail: str
-    type: str
-    instance: str
-
-class Result(BaseModel):
-    arrive_id: str
-    notice_sub_id: int
-    proc_name: str
-    doc_title: str
-    download_date: str
-    file_name_list: list
-
-class OfficialDocumentResponse(BaseModel):
-    metadata: Metadata
-    results: Result
-
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-@app.post("/official_document", response_class=HTMLResponse)
-async def get_official_document(request: Request, arrive_id: str = Form(...), notice_sub_id: int = Form(...)):
-    url = "https://api.example.com/official_document"  # 実際のAPIエンドポイントに変更
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer your_access_token",  # 実際のアクセストークンに変更
-        "x-6eovAPI-Trial": "true"
-    }
-    payload = {"arrive_id": arrive_id, "notice_sub_id": notice_sub_id}
-
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=payload, headers=headers)
-            response.raise_for_status()  # HTTPステータスコードが200番台でない場合例外を発生
-        document = response.json()
-        return templates.TemplateResponse("index.html", {"request": request, "document": document})
-    except httpx.HTTPStatusError as exc:
-        error_message = f"HTTP error occurred: {exc.response.status_code} - {exc.response.text}"
-        return templates.TemplateResponse("index.html", {"request": request, "error": error_message})
-    except Exception as exc:
-        error_message = f"An error occurred: {str(exc)}"
-        return templates.TemplateResponse("index.html", {"request": request, "error": error_message})
+# MCPサーバーの作成
+legal_tools = create_sdk_mcp_server(
+    name="legal_tools",
+    version="1.0.0",
+    tools=[search_law, search_case]
+)
 ```
 
-**index.html**
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Official Document</title>
-</head>
-<body>
-    <h1>Official Document</h1>
-    <form action="/official_document" method="post">
-        <label for="arrive_id">Arrive ID:</label>
-        <input type="text" id="arrive_id" name="arrive_id" required>
-        <br>
-        <label for="notice_sub_id">Notice Sub ID:</label>
-        <input type="number" id="notice_sub_id" name="notice_sub_id" required>
-        <br>
-        <button type="submit">Get Document</button>
-    </form>
-    {% if document %}
-    <h2>Document Details</h2>
-    <pre>{{ document }}</pre>
-    {% endif %}
-</body>
-</html>
-```
+## 開発ロードマップ
 
-### 📝 8.11 実行方法を記す
-1. リポジトリをクローンします。
-2. Dockerを使用してアプリケーションをビルドし、実行します。
-   ```bash
-   docker build -t e-gov-api-fastapi .
-   docker run -d -p 8001:8001 e-gov-api-fastapi
-   ```
-3. ブラウザで `http://localhost:8001` にアクセスし
+### Phase 1: 基盤構築（現在）
+- [ ] FastAPIプロジェクトの初期化
+- [ ] e-gov API クライアントの実装
+- [ ] 基本的な法令検索エンドポイントの実装
 
-、公的文書を取得するためのフォームに必要な情報を入力して送信します。
+### Phase 2: 判例データの統合
+- [ ] 判例データソースの調査・選定
+- [ ] スクレイピング/APIクライアントの実装
+- [ ] 判例検索エンドポイントの実装
 
----
+### Phase 3: AI統合
+- [ ] Agentic RAGの実装
+- [ ] Claude Agent SDK統合
+- [ ] MCPサーバーとしての機能提供
 
-## 追加点
-- **FastAPIの利点:** FastAPIは、非常に高速で、開発者にとって使いやすいです。他のフレームワーク、例えばDjangoやFlaskに比べて、非同期機能が組み込みでサポートされているため、パフォーマンスが向上します。
-- **Flaskとの比較:** Flaskは軽量で、シンプルなアプリケーションを迅速に開発するのに適していますが、FastAPIはより高速で、データバリデーションとシリアル化のためのPydanticを活用することができます。
-- **バックエンドとは:** バックエンドは、アプリケーションのサーバー側の部分で、データベースとのやり取りや、ビジネスロジックの実行を担当します。このプロジェクトでは、FastAPIがバックエンドとして機能し、e-Gov APIとの通信を行います。
+### Phase 4: 高度な機能
+- [ ] 法令・判例の関連性分析
+- [ ] 自然言語による法律相談
+- [ ] 法的文書の自動要約
 
----
+## ライセンス
 
-### 👨‍🏫 豆知識
-- **Django:** Pythonで最も人気のあるフレームワークの一つで、大規模なウェブアプリケーションに適しています。豊富な機能が標準で提供されています。
-- **Flask:** 軽量なマイクロフレームワークで、簡単に拡張できるのが特徴です。シンプルなアプリケーションに適しています。
-- **バックエンド開発:** クライアントサイド（フロントエンド）からのリクエストを処理し、必要なデータを提供する役割を担います。サーバー、データベース、アプリケーションロジックを含みます。
+TBD
 
+## 貢献
+
+TBD
+
+## 参考資料
+
+- [e-gov 法令API](https://elaws.e-gov.go.jp/)
+- [Claude Agent SDK Documentation](https://code.claude.com/docs/ja/sdk/migration-guide)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [uv Documentation](https://github.com/astral-sh/uv)
