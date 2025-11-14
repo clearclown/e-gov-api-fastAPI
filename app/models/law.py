@@ -2,7 +2,7 @@
 
 from datetime import date
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class LawDetail(BaseModel):
@@ -17,8 +17,8 @@ class LawDetail(BaseModel):
     full_text: str = Field(..., description="法令全文")
     updated_at: Optional[date] = Field(None, description="最終更新日")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "law_id": "405AC0000000087",
                 "law_name": "民法",
@@ -30,6 +30,7 @@ class LawDetail(BaseModel):
                 "updated_at": "2024-01-01",
             }
         }
+    )
 
 
 class LawSearchResult(BaseModel):

@@ -1,7 +1,7 @@
 """Conversation API endpoints"""
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.services.conversation_service import ConversationService
 
 router = APIRouter(prefix="/api/v1/conversation", tags=["conversation"])
@@ -13,8 +13,9 @@ class StartConversationRequest(BaseModel):
 
     user_id: str
 
-    class Config:
-        json_schema_extra = {"example": {"user_id": "user_12345"}}
+    model_config = ConfigDict(
+        json_schema_extra={"example": {"user_id": "user_12345"}}
+    )
 
 
 class AskQuestionRequest(BaseModel):
@@ -23,13 +24,14 @@ class AskQuestionRequest(BaseModel):
     conversation_id: str
     question: str
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "conversation_id": "user_12345_1699999999",
                 "question": "契約を解除するにはどうすればよいですか？",
             }
         }
+    )
 
 
 @router.post("/start")

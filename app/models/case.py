@@ -2,7 +2,7 @@
 
 from datetime import date
 from typing import Optional, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class CaseDetail(BaseModel):
@@ -19,8 +19,8 @@ class CaseDetail(BaseModel):
     main_text: str = Field(..., description="判決全文")
     outcome: Optional[str] = Field(None, description="判決結果")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "case_id": "CASE-2024-001",
                 "case_name": "○○事件",
@@ -34,6 +34,7 @@ class CaseDetail(BaseModel):
                 "outcome": "上告棄却",
             }
         }
+    )
 
 
 class CaseReference(BaseModel):
@@ -47,8 +48,8 @@ class CaseReference(BaseModel):
     )
     context: Optional[str] = Field(None, description="引用文脈")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "case_id": "CASE-2024-001",
                 "referenced_law_id": "405AC0000000087",
@@ -56,6 +57,7 @@ class CaseReference(BaseModel):
                 "context": "民法第309条に基づき...",
             }
         }
+    )
 
 
 class CaseSearchResult(BaseModel):

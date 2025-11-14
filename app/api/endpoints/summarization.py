@@ -14,7 +14,7 @@ async def summarize_case(
     case_id: str,
     style: str = Query(
         "brief",
-        regex="^(brief|detailed|plain)$",
+        pattern="^(brief|detailed|plain)$",
         description="要約スタイル: brief(簡潔), detailed(詳細), plain(平易)",
     ),
 ) -> dict:

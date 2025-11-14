@@ -157,28 +157,73 @@ class SummarizationService:
 
     def _extract_article(self, full_text: str, article_number: str) -> Optional[str]:
         """条文を抽出（簡易実装）"""
-        # 条文番号でテキストを分割して該当部分を抽出
-        pattern = rf"{re.escape(article_number)}[^\n]*\n([^第]+)"
-        match = re.search(pattern, full_text)
+        # アラビア数字を漢数字に変換して両方で検索
+        arabic_patterns = [article_number]
 
-        if match:
-            return f"{article_number}\n{match.group(1).strip()}"
+        # 「第123条」のようなパターンから数字を抽出し、漢数字版も作成
+        if "第" in article_number and "条" in article_number:
+            num_match = re.search(r'第(\d+)条', article_number)
+            if num_match:
+                num = num_match.group(1)
+                kanji_num = self._arabic_to_kanji(int(num))
+                arabic_patterns.append(f"第{kanji_num}条")
 
-        # フォールバック: 条文番号を含む段落を返す
-        lines = full_text.split("\n")
-        for i, line in enumerate(lines):
-            if article_number in line:
-                # 次の条文または編まで取得
-                result = [line]
-                for next_line in lines[i + 1 :]:
-                    if next_line.startswith("第") and "条" in next_line:
-                        break
-                    if next_line.startswith("第") and "編" in next_line:
-                        break
-                    result.append(next_line)
-                return "\n".join(result).strip()
+        # 各パターンで検索
+        for pattern_article in arabic_patterns:
+            # 条文番号でテキストを分割して該当部分を抽出
+            pattern = rf"{re.escape(pattern_article)}[^\n]*\n([^第]+)"
+            match = re.search(pattern, full_text)
+
+            if match:
+                return f"{pattern_article}\n{match.group(1).strip()}"
+
+            # フォールバック: 条文番号を含む段落を返す
+            lines = full_text.split("\n")
+            for i, line in enumerate(lines):
+                if pattern_article in line:
+                    # 次の条文または編まで取得
+                    result = [line]
+                    for next_line in lines[i + 1 :]:
+                        if next_line.startswith("第") and "条" in next_line:
+                            break
+                        if next_line.startswith("第") and "編" in next_line:
+                            break
+                        result.append(next_line)
+                    return "\n".join(result).strip()
 
         return None
+
+    def _arabic_to_kanji(self, num: int) -> str:
+        """アラビア数字を漢数字に変換"""
+        if num == 0:
+            return "零"
+
+        kanji_digits = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九"]
+        kanji_units = ["", "十", "百", "千"]
+        kanji_big_units = ["", "万", "億"]
+
+        if num < 10:
+            return kanji_digits[num]
+
+        result = []
+        unit_idx = 0
+
+        while num > 0:
+            digit = num % 10
+            if digit != 0:
+                if unit_idx > 0:
+                    if digit == 1 and unit_idx == 1:  # 十の位の1は省略可能
+                        result.insert(0, kanji_units[unit_idx])
+                    else:
+                        result.insert(0, kanji_digits[digit] + kanji_units[unit_idx])
+                else:
+                    result.insert(0, kanji_digits[digit])
+            num //= 10
+            unit_idx += 1
+            if unit_idx >= len(kanji_units):
+                break
+
+        return "".join(result)
 
     async def generate_comparative_summary(
         self, law_id_1: str, law_id_2: str
