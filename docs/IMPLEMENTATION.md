@@ -19,11 +19,12 @@ This document describes the implementation of the Case Law API (Phase 2) for the
    - SQLAlchemy models for cases and references
    - Async session management
    - Database initialization utilities
-   - Alembic migrations
+   - Alembic migrations (including GIN index for full-text search)
 
 3. **Repository Layer** (`app/repositories/case_repository.py`)
    - Case CRUD operations
-   - Full-text search functionality
+   - **PostgreSQL Full-Text Search** with GIN index
+   - Dual search modes: FTS (default) and ILIKE fallback
    - Law-to-case relationship queries
    - Pagination support
 
@@ -45,9 +46,15 @@ This document describes the implementation of the Case Law API (Phase 2) for the
 
 7. **Testing**
    - Unit tests for scraper service
-   - Unit tests for repository
+   - Unit tests for repository (including full-text search tests)
    - Integration tests for API endpoints
    - Test fixtures and configuration
+
+8. **Full-Text Search** (`docs/FULLTEXT_SEARCH.md`)
+   - PostgreSQL GIN index implementation
+   - `to_tsvector` and `plainto_tsquery` usage
+   - Dual search mode support
+   - Japanese text search considerations
 
 ## Setup Instructions
 
@@ -80,9 +87,11 @@ cp .env.example .env
 # Create PostgreSQL database
 createdb egov_db
 
-# Run migrations
+# Run migrations (including GIN index for full-text search)
 alembic upgrade head
 ```
+
+**Note:** Migration `002_add_fulltext_search_index.py` creates a GIN index for high-performance full-text search. See `docs/FULLTEXT_SEARCH.md` for details.
 
 ### 4. Run the Application
 

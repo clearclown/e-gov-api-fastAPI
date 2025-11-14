@@ -130,20 +130,59 @@ class CaseRepository:
         date_to: date | None = None,
         limit: int = 50,
         offset: int = 0,
+        use_fulltext: bool = True,
     ) -> tuple[list[CaseSearchResult], int]:
-        """判例検索（全文検索対応）"""
+        """判例検索（全文検索対応）
+
+        Args:
+            query: 検索キーワード
+            court_type: 裁判所種別でフィルタ
+            case_type: 事件種別でフィルタ
+            date_from: 判決日の開始日
+            date_to: 判決日の終了日
+            limit: 取得件数
+            offset: オフセット
+            use_fulltext: PostgreSQL全文検索を使用するか（Falseの場合はILIKE検索）
+
+        Returns:
+            検索結果リストと総件数のタプル
+        """
         # Build base query
         stmt = select(CaseModel)
 
         # Apply filters
         if query:
-            # Simple text search (can be enhanced with PostgreSQL full-text search)
-            search_filter = (
-                CaseModel.case_name.ilike(f"%{query}%")
-                | CaseModel.summary.ilike(f"%{query}%")
-                | CaseModel.main_text.ilike(f"%{query}%")
-            )
-            stmt = stmt.where(search_filter)
+            if use_fulltext:
+                # PostgreSQL full-text search using to_tsvector and to_tsquery
+                # Using 'simple' configuration for broader compatibility
+                from sqlalchemy import func, text
+
+                # Create full-text search expression
+                # Note: This matches the GIN index structure
+                tsvector_expr = func.to_tsvector(
+                    'simple',
+                    func.concat(
+                        CaseModel.case_name,
+                        ' ',
+                        func.coalesce(CaseModel.summary, ''),
+                        ' ',
+                        CaseModel.main_text
+                    )
+                )
+
+                # Convert query to tsquery (using plainto_tsquery for natural language queries)
+                tsquery_expr = func.plainto_tsquery('simple', query)
+
+                # Apply full-text search filter
+                stmt = stmt.where(tsvector_expr.op('@@')(tsquery_expr))
+            else:
+                # Fallback to simple ILIKE search (slower but works without GIN index)
+                search_filter = (
+                    CaseModel.case_name.ilike(f"%{query}%")
+                    | CaseModel.summary.ilike(f"%{query}%")
+                    | CaseModel.main_text.ilike(f"%{query}%")
+                )
+                stmt = stmt.where(search_filter)
 
         if court_type:
             stmt = stmt.where(CaseModel.court_type == court_type)
