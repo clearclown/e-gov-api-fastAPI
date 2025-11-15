@@ -1,212 +1,372 @@
-# e-gov API FastAPI
+<div align="center">
 
-日本国内の法律および判例に関する正確で最新の情報を取得するためのAPIプロジェクト
+# 📚 e-gov API FastAPI
 
-## プロジェクト概要
+**日本の法令・判例データを提供する高速APIサーバー**
 
-このプロジェクトは、日本の法律・判例情報へのアクセスを提供するFastAPIベースのAPIサーバーです。uvパッケージマネージャーを使用し、将来的にはAgentic RAGやClaude Agent SDKとの統合を見据えた設計となっています。
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compatible-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Podman](https://img.shields.io/badge/Podman-Compatible-892CA0?style=for-the-badge&logo=podman&logoColor=white)](https://podman.io/)
+[![uv](https://img.shields.io/badge/uv-Package_Manager-FF6B35?style=for-the-badge)](https://github.com/astral-sh/uv)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-## 主な機能目標
+[🇯🇵 日本語](README.md) | [🇬🇧 English](docs/readmeLang/README.en.md) | [🇨🇳 简体中文](docs/readmeLang/README.zh-CN.md) | [🇹🇼 繁體中文](docs/readmeLang/README.zh-TW.md) | [🇷🇺 Русский](docs/readmeLang/README.ru.md) | [🇮🇷 فارسی](docs/readmeLang/README.fa.md) | [🇸🇦 العربية](docs/readmeLang/README.ar.md)
 
-### 1. 法律情報の取得
-- **e-gov法令API**との統合
-  - 日本国内の現行法令の検索・取得
-  - 法令の改正履歴の追跡
-  - 法令データの構造化された提供
+</div>
 
-### 2. 判例情報の取得
-- 信頼性の高い判例データソースの統合
-  - 裁判所ウェブサイトからのデータ取得
-  - 判例データベースAPIの活用
-  - Webスクレイピングによる補完的なデータ収集
+---
 
-### 3. 将来的な拡張
+## 📸 スクリーンショット
 
-#### Agentic RAG統合
-- 法律・判例データの効率的な検索と取得
-- コンテキストを考慮した情報提供
-- 複数のデータソースを横断した統合検索
+<div align="center">
 
-#### Claude Agent SDK統合
-参考: [Claude Agent SDK Migration Guide](https://code.claude.com/docs/ja/sdk/migration-guide)
+### API ドキュメント (Swagger UI)
 
-- カスタムツールとしての法律・判例検索機能の提供
-- 自然言語による法律相談インターフェース
-- 法的文書の分析・要約機能
+![API Documentation](docs/pics/api-docs.png)
 
-## 技術スタック
+*FastAPIによる自動生成APIドキュメント*
 
-- **フレームワーク**: FastAPI
-- **パッケージ管理**: uv
-- **Python**: 3.10+
-- **予定統合**:
-  - Claude Agent SDK (`@anthropic-ai/claude-agent-sdk`)
-  - MCP (Model Context Protocol) サーバー実装
+---
 
-## プロジェクト構造（予定）
+### 法令検索のレスポンス例
 
-```
-e-gov-api-fastAPI/
-├── app/
-│   ├── api/
-│   │   ├── endpoints/
-│   │   │   ├── laws.py          # 法令API
-│   │   │   └── cases.py         # 判例API
-│   │   └── router.py
-│   ├── core/
-│   │   ├── config.py
-│   │   └── security.py
-│   ├── services/
-│   │   ├── egov_client.py       # e-gov API クライアント
-│   │   ├── case_scraper.py      # 判例スクレイピング
-│   │   └── rag_service.py       # RAG統合サービス
-│   └── main.py
-├── .claude/
-│   ├── agents/                   # Claude サブエージェント定義
-│   ├── skills/                   # カスタムスキル
-│   └── settings.json
-├── tests/
-├── pyproject.toml
-└── README.md
-```
+![Law Search Response](docs/pics/law-search.png)
 
-## セットアップ
+*キーワード「表現の自由」での検索結果*
 
-### 必要要件
-- Python 3.10以上
-- **uv** パッケージマネージャー (推奨)
-- **Podman** (コンテナ実行の場合)
+---
 
-### クイックスタート
+### 判例検索のレスポンス例
 
-#### 方法1: uvを使用（推奨）
+![Case Search Response](docs/pics/case-search.png)
+
+*キーワード「表現の不自由展かんさい」での判例検索結果*
+
+</div>
+
+---
+
+## 📖 簡単な説明
+
+**e-gov API FastAPI** は、日本の法令および判例データに高速アクセスできるRESTful APIサーバーです。
+
+[e-gov 法令API](https://elaws.e-gov.go.jp/) および [裁判所ウェブサイト](https://www.courts.go.jp/) と連携し、リアルタイムで最新の法律情報を提供します。
+
+**主な機能:**
+- 🔍 法令検索・詳細取得・改正履歴
+- ⚖️ 判例検索・詳細取得
+- 📊 法令と判例の関係性分析
+- 🚀 Redisキャッシュによる高速化
+- 🌐 VPN/Tailscale対応
+
+---
+
+## 🎯 なぜこれが必要なのか + 何をするものなのか
+
+### 課題
+
+日本の法律情報にアクセスする際、以下の問題があります：
+
+- **法令データの散在**: 政府APIは使いづらく、ドキュメント不足
+- **判例データの取得困難**: 体系的なAPIが存在しない
+- **データ統合の複雑さ**: 法令と判例の関連性を分析する仕組みがない
+
+### 解決策
+
+このAPIサーバーは、複数のデータソースを統合し、開発者が簡単に日本の法律情報にアクセスできるようにします。
+
+**何をするものなのか:**
+- 法令データベースへの統一的なアクセス
+- 判例データの検索・取得
+- 法令と判例の関係性分析
+- 高速レスポンス（キャッシュ機能）
+
+**ユースケース:**
+- 法律相談アプリケーションのバックエンド
+- リーガルテック製品の基盤API
+- 法律データ分析・研究
+- 法令改正の自動追跡システム
+
+---
+
+## 🚀 Installation
+
+### 必要な環境
+
+- Python 3.12+
+- Docker または Podman
+- uv (パッケージマネージャー)
+
+### 方法1: Docker/Podman で起動（推奨）
 
 ```bash
-# 1. uvのインストール（未インストールの場合）
+# リポジトリのクローン
+git clone https://github.com/clearclown/e-gov-api-fastAPI.git
+cd e-gov-api-fastapi
+
+# 環境変数の設定
+cp .env.example .env
+
+# 起動
+podman compose up -d
+# または
+docker compose up -d
+
+# 動作確認
+curl http://localhost:8000/health
+```
+
+### 方法2: uv で開発環境セットアップ
+
+```bash
+# uv のインストール
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# 2. 依存関係のセットアップ
-./scripts/setup-uv.sh
-# または: uv sync
+# 仮想環境の作成
+uv venv
 
-# 3. 開発サーバーの起動
-./scripts/run-dev.sh
-# または: uv run uvicorn app.main:app --reload
+# 仮想環境の有効化
+source .venv/bin/activate  # Linux/Mac
+.venv\Scripts\activate     # Windows
+
+# 依存関係のインストール
+uv pip install -e .
+
+# 開発サーバーの起動
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-#### 方法2: Podmanを使用
+### アクセス
+
+- **API ドキュメント**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **ヘルスチェック**: http://localhost:8000/health
+
+---
+
+## 🗑️ Uninstall
+
+### Docker/Podman 環境
 
 ```bash
-# 1. イメージのビルド
-./scripts/podman-build.sh
+# サービスの停止と削除
+podman compose down
 
-# 2. サービスの起動(PostgreSQL, Redis, API)
-./scripts/podman-up.sh
+# ボリュームも含めて完全削除
+podman compose down -v
 
-# 3. サービスの停止
-./scripts/podman-down.sh
+# イメージの削除
+podman rmi e-gov-api-fastapi-app
 ```
 
-詳細なセットアップ手順は [docs/SETUP_UV_PODMAN.md](docs/SETUP_UV_PODMAN.md) を参照してください。
+### uv 環境
 
-## API設計（予定）
+```bash
+# 仮想環境の削除
+rm -rf .venv
 
-### 法令エンドポイント
-
-```
-GET /api/v1/laws/search        # 法令検索
-GET /api/v1/laws/{law_id}      # 特定法令の取得
-GET /api/v1/laws/{law_id}/history  # 改正履歴
+# キャッシュのクリア
+uv cache clean
 ```
 
-### 判例エンドポイント
+---
+
+## 📚 Documentation
+
+### 基本技術
+
+| カテゴリ | 技術 |
+|---------|------|
+| **フレームワーク** | FastAPI |
+| **言語** | Python 3.12+ |
+| **データベース** | PostgreSQL 16 + pgvector |
+| **キャッシュ** | Redis 7 |
+| **パッケージマネージャー** | uv |
+| **コンテナ** | Docker / Podman |
+| **外部API** | e-gov 法令API, 裁判所 |
+
+### 仕組み
 
 ```
-GET /api/v1/cases/search       # 判例検索
-GET /api/v1/cases/{case_id}    # 特定判例の取得
+┌─────────────┐
+│  クライアント  │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────────────────────┐
+│   FastAPI アプリケーション   │
+│  ┌──────────────────────┐  │
+│  │  法令エンドポイント    │  │
+│  │  判例エンドポイント    │  │
+│  │  分析エンドポイント    │  │
+│  └──────────────────────┘  │
+└──┬───────────┬──────────┬───┘
+   │           │          │
+   ▼           ▼          ▼
+┌──────┐  ┌────────┐  ┌─────────┐
+│Redis │  │Postgres│  │e-gov API│
+│Cache │  │Database│  │裁判所DB  │
+└──────┘  └────────┘  └─────────┘
 ```
 
-## データソース
+**データフロー:**
+1. クライアントがAPIリクエストを送信
+2. FastAPIがリクエストを処理
+3. Redisキャッシュを確認（ヒット時は即座にレスポンス）
+4. キャッシュミス時は外部API（e-gov/裁判所）からデータ取得
+5. 取得データをPostgreSQLに保存
+6. レスポンスを返却し、Redisにキャッシュ
 
-### 1. e-gov 法令API
-- URL: https://elaws.e-gov.go.jp/
-- 提供データ: 日本国内の全法令データ
-- 更新頻度: リアルタイム
+### インフラ
 
-### 2. 裁判所ウェブサイト
-- URL: https://www.courts.go.jp/
-- 提供データ: 判例情報
-- 取得方法: APIまたはWebスクレイピング
-
-### 3. その他検討中のデータソース
-- 判例データベースAPI（商用含む）
-- 法律関連オープンデータ
-
-## Claude Agent SDK統合例
-
-```python
-from claude_agent_sdk import tool, create_sdk_mcp_server
-
-@tool("search_law", "日本の法令を検索", {"query": str})
-async def search_law(args):
-    # e-gov APIを使用した法令検索
-    results = await egov_client.search(args["query"])
-    return {"content": [{"type": "text", "text": results}]}
-
-@tool("search_case", "判例を検索", {"keywords": str})
-async def search_case(args):
-    # 判例データベースでの検索
-    results = await case_service.search(args["keywords"])
-    return {"content": [{"type": "text", "text": results}]}
-
-# MCPサーバーの作成
-legal_tools = create_sdk_mcp_server(
-    name="legal_tools",
-    version="1.0.0",
-    tools=[search_law, search_case]
-)
+**ファイル構成:**
+```
+e-gov-api-fastapi/
+├── app/                    # アプリケーションコード
+│   ├── api/               # APIエンドポイント
+│   ├── core/              # コア設定・DB接続
+│   ├── services/          # ビジネスロジック
+│   └── main.py            # エントリーポイント
+├── infra/
+│   └── podmanOrDocker/    # Docker/Podman設定
+│       ├── Dockerfile     # フル版（AI機能含む）
+│       └── Dockerfile.lite # 軽量版（API機能のみ）
+├── docs/                   # ドキュメント
+│   ├── pics/              # スクリーンショット
+│   └── readmeLang/        # 多言語README
+├── scripts/               # 便利スクリプト
+├── docker-compose.yml     # メインCompose設定
+├── pyproject.toml         # プロジェクト設定
+└── .env                   # 環境変数
 ```
 
-## 開発ロードマップ
+**リソース使用量:**
 
-### Phase 1: 基盤構築 ✅
-- [x] FastAPIプロジェクトの初期化
-- [x] e-gov API クライアントの実装
-- [x] 基本的な法令検索エンドポイントの実装
+軽量版（デフォルト）:
+- API サーバー: ~600MB
+- PostgreSQL: ~500MB
+- Redis: ~50MB
+- **合計:** ~1.2GB
 
-### Phase 2: 判例データの統合 ✅
-- [x] 判例データソースの調査・選定
-- [x] スクレイピング/APIクライアントの実装
-- [x] 判例検索エンドポイントの実装
-- [x] PostgreSQL全文検索の実装
+フル版（AI機能含む）:
+- API サーバー: ~3-4GB (PyTorch + CUDA)
+- PostgreSQL: ~500MB
+- Redis: ~50MB
+- **合計:** ~4-5GB
 
-### Phase 3: AI統合 ✅
-- [x] Agentic RAGの実装
-- [x] ベクトル検索（pgvector）の統合
-- [x] Claude API連携
-- [x] MCPサーバーとしての機能提供
+### ネットワーク
 
-### Phase 4: 高度な機能 ✅
-- [x] 法令・判例の関連性分析
-- [x] 自然言語による法律相談
-- [x] 法的文書の自動要約
-- [x] ネットワーク分析機能
+**アクセス方法:**
 
-### 現在のステータス
-すべてのフェーズが完了し、統合が完了しています。
-本番環境へのデプロイ準備が可能な状態です。
+すべてのサービスは `0.0.0.0` でリッスンしており、以下の方法でアクセス可能：
 
-## ライセンス
+1. **ローカルホスト**: `http://localhost:8000`
+2. **ローカルネットワーク**: `http://[ホストIP]:8000`
+3. **Tailscale/VPN**: `http://[TailscaleのIP]:8000`
 
-TBD
+**ポート設定（.env で変更可能）:**
+- API サーバー: `8000`
+- PostgreSQL: `5432`
+- Redis: `6379`
 
-## 貢献
+**VPN/Tailscale対応:**
 
-TBD
+0.0.0.0 バインディングにより、リモートアクセスが可能です。
 
-## 参考資料
+### これからの課題
 
-- [e-gov 法令API](https://elaws.e-gov.go.jp/)
-- [Claude Agent SDK Documentation](https://code.claude.com/docs/ja/sdk/migration-guide)
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [uv Documentation](https://github.com/astral-sh/uv)
+**Phase 1 & 2: 基本機能** ✅ **完了**
+- [x] e-gov API クライアント実装
+- [x] 法令検索・詳細取得エンドポイント
+- [x] 判例スクレイピング・検索機能
+- [x] Redis キャッシュ実装
+- [x] PostgreSQL データベース統合
+- [x] Docker/Podman 完全対応
+
+**Phase 3: AI統合機能** 🔄 **計画中**
+- [ ] AgenticRAG による意味的検索
+- [ ] ベクトル検索（pgvector使用）
+- [ ] Claude API 統合
+- [ ] 自然言語での質問応答
+- [ ] MCP サーバー実装
+
+**Phase 4: 高度な分析機能** 🔄 **計画中**
+- [ ] 法令・判例の関係性グラフ可視化
+- [ ] 判例引用ネットワーク分析
+- [ ] 自動要約生成
+- [ ] チャット形式の法律相談インターフェース
+
+---
+
+## 🤝 Contributing
+
+プロジェクトへの貢献を歓迎します！
+
+**バグ報告・機能リクエスト:**
+
+[GitHub Issues](https://github.com/clearclown/e-gov-api-fastAPI/issues) で報告してください。
+
+**プルリクエスト:**
+
+1. このリポジトリをフォーク
+2. 機能ブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. 変更をコミット (`git commit -m 'feat: Add amazing feature'`)
+4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
+5. プルリクエストを作成
+
+**開発ガイドライン:**
+- コードスタイル: PEP 8 に準拠
+- コミットメッセージ: Conventional Commits 形式
+- テスト: 新機能には必ずテストを追加
+
+---
+
+## 📚 Resources
+
+### 公式ドキュメント
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [e-gov 法令API 仕様](https://elaws.e-gov.go.jp/apitop/)
+- [uv - Python パッケージマネージャー](https://github.com/astral-sh/uv)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Redis](https://redis.io/)
+
+### 関連プロジェクト
+- [pgvector](https://github.com/pgvector/pgvector) - PostgreSQL ベクトル検索拡張
+- [Claude API](https://docs.anthropic.com/) - Anthropic Claude AI
+
+### データソース
+- [e-gov 法令データベース](https://elaws.e-gov.go.jp/)
+- [裁判所ウェブサイト](https://www.courts.go.jp/)
+
+---
+
+## ⚖️ Legal
+
+このプロジェクトは以下のデュアルライセンスで提供されています：
+
+### MIT License
+個人・商用利用に最適
+
+[LICENSE-MIT](LICENSE-MIT) を参照
+
+### Apache License 2.0
+企業利用・特許保護が必要な場合
+
+[LICENSE-APACHE](LICENSE-APACHE) を参照
+
+**お好きなライセンスを選択してご利用ください。**
+
+---
+
+<div align="center">
+
+**⭐ このプロジェクトが役に立った場合は、スターをお願いします！**
+
+Made with ❤️ by [clearclown](https://github.com/clearclown)
+
+📧 Contact: clearclown@gmail.com
+
+</div>
