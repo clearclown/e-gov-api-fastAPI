@@ -13,8 +13,9 @@ import time
 
 from app.core.config import settings
 from app.core.cache import law_cache
+from app.core.database import db
 from app.core.exceptions import EGovAPIError
-from app.api.endpoints import laws, cases
+from app.api.endpoints import laws, cases, analytics, conversation, summarization
 
 # ロギング設定
 log_level_str = settings.log_level.strip('"').strip("'").upper()
@@ -39,6 +40,13 @@ async def lifespan(app: FastAPI):
     logger.info(f"{settings.app_name} v{settings.app_version} 起動中...")
     logger.info("=" * 50)
 
+    # データベース接続
+    try:
+        await db.connect()
+        logger.info("✓ データベース接続成功")
+    except Exception as e:
+        logger.warning(f"⚠ データベース接続失敗（一部機能が制限されます）: {e}")
+
     # Redisキャッシュ接続
     if settings.redis_enabled:
         try:
@@ -61,6 +69,10 @@ async def lifespan(app: FastAPI):
         await law_cache.disconnect()
         logger.info("✓ Redisキャッシュ切断完了")
 
+    # データベース切断
+    await db.disconnect()
+    logger.info("✓ データベース切断完了")
+
     logger.info("✓ アプリケーション終了完了")
 
 
@@ -69,17 +81,32 @@ app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
     description="""
-    ## 日本法令API
+    ## 日本法令・判例API
 
-    e-gov法令APIと連携し、日本国内の法令データを検索・取得するAPIです。
+    e-gov法令APIおよび裁判所判例データと連携し、日本国内の法令・判例データを検索・取得し、
+    AI技術を活用した高度な分析・要約・対話機能を提供するAPIです。
 
-    ### 主な機能
+    ### Phase 1 & 2: 基本機能
     - **法令検索**: キーワードによる法令検索
     - **法令詳細取得**: 特定の法令の全文および詳細情報
     - **改正履歴取得**: 法令の改正履歴
+    - **判例検索**: キーワード・裁判所・事件タイプによる判例検索
+    - **判例詳細取得**: 特定の判例の全文および詳細情報
+
+    ### Phase 3: AI統合機能
+    - **RAG検索**: ベクトル検索による意味的な法令・判例検索
+    - **コンテキスト生成**: 関連する法令・判例の自動抽出
+    - **Claude API連携**: 自然言語での質問応答
+
+    ### Phase 4: 高度な分析機能
+    - **関係分析**: 法令と判例の関連性をグラフ構造で分析
+    - **ネットワーク可視化**: 判例の引用関係をネットワークで表現
+    - **要約生成**: 法令・判例の自動要約
+    - **対話型インターフェース**: チャット形式での法律相談
 
     ### データソース
     - [e-gov 法令API](https://elaws.e-gov.go.jp/)
+    - [裁判所ウェブサイト](https://www.courts.go.jp/)
     """,
     docs_url="/docs",
     redoc_url="/redoc",
@@ -173,6 +200,9 @@ async def general_exception_handler(request: Request, exc: Exception):
 # ルーター登録
 app.include_router(laws.router)
 app.include_router(cases.router)
+app.include_router(analytics.router)
+app.include_router(conversation.router)
+app.include_router(summarization.router)
 
 
 # ルートエンドポイント
@@ -195,12 +225,27 @@ async def root():
         "docs": "/docs",
         "redoc": "/redoc",
         "endpoints": {
-            "laws_search": "/api/v1/laws/search",
-            "law_detail": "/api/v1/laws/{law_id}",
-            "law_history": "/api/v1/laws/{law_id}/history",
-            "cases_search": "/api/v1/cases/search",
-            "case_detail": "/api/v1/cases/{case_id}",
-            "courts_list": "/api/v1/cases/courts/list"
+            "laws": {
+                "search": "/api/v1/laws/search",
+                "detail": "/api/v1/laws/{law_id}",
+                "history": "/api/v1/laws/{law_id}/history"
+            },
+            "cases": {
+                "search": "/api/v1/cases/search",
+                "detail": "/api/v1/cases/{case_id}",
+                "courts": "/api/v1/cases/courts/list"
+            },
+            "analytics": {
+                "law_case_relationship": "/api/v1/analytics/law-case-relationship",
+                "case_network": "/api/v1/analytics/case-network"
+            },
+            "conversation": {
+                "ask": "/api/v1/conversation/ask"
+            },
+            "summarization": {
+                "law": "/api/v1/summarization/law/{law_id}",
+                "case": "/api/v1/summarization/case/{case_id}"
+            }
         }
     }
 
