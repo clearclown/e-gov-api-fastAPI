@@ -57,3 +57,6 @@ dump.rdb
 
 # Documentation
 docs/_build/
+
+# Claude Code
+.claude/
