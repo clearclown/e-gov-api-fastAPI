@@ -17,19 +17,22 @@ dependencies = [
     "python-multipart>=0.0.6",
     "beautifulsoup4>=4.12.0",
     "lxml>=4.9.0",
-    # Phase 3 dependencies (AI Integration)
-    "anthropic>=0.39.0",
-    "sentence-transformers>=2.2.0",
-    "numpy>=1.24.0",
     "psycopg[binary]>=3.1.0",
-    "pgvector>=0.2.0",
     "python-dotenv>=1.0.0",
-    # Phase 4 dependencies (Advanced Analytics)
-    "networkx>=3.0",
     "sqlalchemy>=2.0.0",
+    "networkx>=3.0",
+    "anthropic>=0.39.0",
+    "pgvector>=0.2.0",
 ]
 
 [project.optional-dependencies]
+# AI機能（埋め込み生成・RAG）- PyTorch + CUDA必要
+ai = [
+    "sentence-transformers>=2.2.0",
+    "numpy>=1.24.0",
+    "torch>=2.0.0",
+]
+
 dev = [
     "pytest>=7.4.3",
     "pytest-asyncio>=0.23.3",
