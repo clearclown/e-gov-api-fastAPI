@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "legal_tools": {
+      "type": "sdk",
+      "command": "python",
+      "args": ["-m", "app.mcp.legal_tools"],
+      "env": {
+        "DATABASE_URL": "${DATABASE_URL}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
+      }
+    }
+  }
+}
