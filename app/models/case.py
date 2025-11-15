@@ -139,6 +139,37 @@ class CaseSearchResponse(BaseModel):
     )
 
 
+class CaseReference(BaseModel):
+    """判例引用情報
+
+    判例が法令や他の判例を引用している関係を表すモデル。
+
+    Attributes:
+        case_id: 引用元の判例ID
+        referenced_law_id: 引用先の法令ID（法令を引用している場合）
+        referenced_case_id: 引用先の判例ID（判例を引用している場合）
+        reference_type: 引用の種類
+        context: 引用の文脈
+    """
+    case_id: str = Field(..., description="引用元の判例ID")
+    referenced_law_id: Optional[str] = Field(None, description="引用先の法令ID")
+    referenced_case_id: Optional[str] = Field(None, description="引用先の判例ID")
+    reference_type: str = Field(..., description="引用の種類")
+    context: Optional[str] = Field(None, description="引用の文脈")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "case_id": "2020WLJPCA01010001",
+                "referenced_law_id": "405AC0000000087",
+                "referenced_case_id": None,
+                "reference_type": "cites_law",
+                "context": "本件は会社法第211条に基づき..."
+            }
+        }
+    )
+
+
 class CourtInfo(BaseModel):
     """裁判所情報
 

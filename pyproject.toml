@@ -5,7 +5,7 @@ description = "FastAPI-based API server for Japanese legal information (laws and
 authors = [
     {name = "Your Name", email = "your.email@example.com"}
 ]
-readme = "readme.md"
+readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.109.0",

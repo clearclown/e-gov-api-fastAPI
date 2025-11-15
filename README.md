@@ -74,23 +74,40 @@ e-gov-api-fastAPI/
 
 ### 必要要件
 - Python 3.10以上
-- uv パッケージマネージャー
+- **uv** パッケージマネージャー (推奨)
+- **Podman** (コンテナ実行の場合)
 
-### インストール
+### クイックスタート
+
+#### 方法1: uvを使用（推奨）
 
 ```bash
-# uvのインストール（未インストールの場合）
+# 1. uvのインストール（未インストールの場合）
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# プロジェクトのセットアップ
-uv venv
-source .venv/bin/activate  # Linux/Mac
-# または
-.venv\Scripts\activate  # Windows
+# 2. 依存関係のセットアップ
+./scripts/setup-uv.sh
+# または: uv sync
 
-# 依存関係のインストール
-uv pip install -e .
+# 3. 開発サーバーの起動
+./scripts/run-dev.sh
+# または: uv run uvicorn app.main:app --reload
 ```
+
+#### 方法2: Podmanを使用
+
+```bash
+# 1. イメージのビルド
+./scripts/podman-build.sh
+
+# 2. サービスの起動(PostgreSQL, Redis, API)
+./scripts/podman-up.sh
+
+# 3. サービスの停止
+./scripts/podman-down.sh
+```
+
+詳細なセットアップ手順は [docs/SETUP_UV_PODMAN.md](docs/SETUP_UV_PODMAN.md) を参照してください。
 
 ## API設計（予定）
 

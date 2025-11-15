@@ -1,6 +1,6 @@
 """Data models for the legal API"""
 
-from app.models.law import LawDetail, LawSummary
-from app.models.case import CaseDetail, CaseSummary
+from app.models.law import LawDetail, LawSearchResult
+from app.models.case import CaseDetail
 
-__all__ = ["LawDetail", "LawSummary", "CaseDetail", "CaseSummary"]
+__all__ = ["LawDetail", "LawSearchResult", "CaseDetail"]
