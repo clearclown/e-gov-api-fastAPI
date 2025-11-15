@@ -60,6 +60,20 @@ CREATE TABLE IF NOT EXISTS case_embeddings (
     UNIQUE(case_id, chunk_index)
 );
 
+-- Case references table (Phase 4) - Tracks law and case citations
+CREATE TABLE IF NOT EXISTS case_references (
+    id SERIAL PRIMARY KEY,
+    case_id VARCHAR(50) NOT NULL REFERENCES cases(case_id) ON DELETE CASCADE,
+    referenced_law_id VARCHAR(50),
+    referenced_case_id VARCHAR(50) REFERENCES cases(case_id) ON DELETE CASCADE,
+    reference_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CHECK (
+        (referenced_law_id IS NOT NULL AND referenced_case_id IS NULL) OR
+        (referenced_law_id IS NULL AND referenced_case_id IS NOT NULL)
+    )
+);
+
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_laws_law_number ON laws(law_number);
 CREATE INDEX IF NOT EXISTS idx_laws_law_name ON laws(law_name);
@@ -71,6 +85,10 @@ CREATE INDEX IF NOT EXISTS idx_cases_case_name ON cases(case_name);
 CREATE INDEX IF NOT EXISTS idx_cases_court_name ON cases(court_name);
 CREATE INDEX IF NOT EXISTS idx_cases_decision_date ON cases(decision_date);
 CREATE INDEX IF NOT EXISTS idx_cases_case_type ON cases(case_type);
+
+CREATE INDEX IF NOT EXISTS idx_case_references_case_id ON case_references(case_id);
+CREATE INDEX IF NOT EXISTS idx_case_references_referenced_law_id ON case_references(referenced_law_id);
+CREATE INDEX IF NOT EXISTS idx_case_references_referenced_case_id ON case_references(referenced_case_id);
 
 -- Create vector search indexes using IVFFlat algorithm
 -- Note: These indexes should be created after data is loaded
