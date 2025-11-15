@@ -15,7 +15,16 @@ from app.core.config import settings
 from app.core.cache import law_cache
 from app.core.database import db
 from app.core.exceptions import EGovAPIError
-from app.api.endpoints import laws, cases, analytics, conversation, summarization
+from app.api.endpoints import laws, cases, analytics
+
+# AI機能はオプション（sentence_transformers等がインストールされている場合のみ）
+try:
+    from app.api.endpoints import conversation, summarization
+    AI_FEATURES_AVAILABLE = True
+except ImportError:
+    AI_FEATURES_AVAILABLE = False
+    logger = logging.getLogger(__name__)
+    logger.info("AI機能（conversation, summarization）は利用できません（依存関係がインストールされていません）")
 
 # ロギング設定
 log_level_str = settings.log_level.strip('"').strip("'").upper()
@@ -201,8 +210,11 @@ async def general_exception_handler(request: Request, exc: Exception):
 app.include_router(laws.router)
 app.include_router(cases.router)
 app.include_router(analytics.router)
-app.include_router(conversation.router)
-app.include_router(summarization.router)
+
+# AI機能のルーターは依存関係がある場合のみ登録
+if AI_FEATURES_AVAILABLE:
+    app.include_router(conversation.router)
+    app.include_router(summarization.router)
 
 
 # ルートエンドポイント
@@ -218,35 +230,41 @@ async def root():
     Returns:
         基本情報
     """
+    endpoints = {
+        "laws": {
+            "search": "/api/v1/laws/search",
+            "detail": "/api/v1/laws/{law_id}",
+            "history": "/api/v1/laws/{law_id}/history"
+        },
+        "cases": {
+            "search": "/api/v1/cases/search",
+            "detail": "/api/v1/cases/{case_id}",
+            "courts": "/api/v1/cases/courts/list"
+        },
+        "analytics": {
+            "law_case_relationship": "/api/v1/analytics/law-case-relationship",
+            "case_network": "/api/v1/analytics/case-network"
+        }
+    }
+
+    # AI機能が利用可能な場合のみエンドポイントを追加
+    if AI_FEATURES_AVAILABLE:
+        endpoints["conversation"] = {
+            "ask": "/api/v1/conversation/ask"
+        }
+        endpoints["summarization"] = {
+            "law": "/api/v1/summarization/law/{law_id}",
+            "case": "/api/v1/summarization/case/{case_id}"
+        }
+
     return {
         "name": settings.app_name,
         "version": settings.app_version,
         "description": "日本法令・判例API - e-gov法令APIおよび裁判所判例データと連携した法律情報検索サービス",
         "docs": "/docs",
         "redoc": "/redoc",
-        "endpoints": {
-            "laws": {
-                "search": "/api/v1/laws/search",
-                "detail": "/api/v1/laws/{law_id}",
-                "history": "/api/v1/laws/{law_id}/history"
-            },
-            "cases": {
-                "search": "/api/v1/cases/search",
-                "detail": "/api/v1/cases/{case_id}",
-                "courts": "/api/v1/cases/courts/list"
-            },
-            "analytics": {
-                "law_case_relationship": "/api/v1/analytics/law-case-relationship",
-                "case_network": "/api/v1/analytics/case-network"
-            },
-            "conversation": {
-                "ask": "/api/v1/conversation/ask"
-            },
-            "summarization": {
-                "law": "/api/v1/summarization/law/{law_id}",
-                "case": "/api/v1/summarization/case/{case_id}"
-            }
-        }
+        "ai_features_available": AI_FEATURES_AVAILABLE,
+        "endpoints": endpoints
     }
 
 

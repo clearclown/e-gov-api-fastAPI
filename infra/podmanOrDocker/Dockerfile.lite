@@ -17,7 +17,8 @@ COPY pyproject.toml README.md ./
 COPY app ./app
 COPY .env.example ./.env
 
-# 仮想環境を作成し、コア依存関係のみインストール
+# 仮想環境を作成し、コア依存関係のみインストール（API機能のみ）
+# AgenticRAG、ベクトル検索は将来の実装
 RUN uv venv && \
     uv pip install \
     fastapi \
